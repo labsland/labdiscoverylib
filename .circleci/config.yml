@@ -1,19 +1,13 @@
 version: 2.1
 
-executors:
-  python-executor:
-    parameters:
-      version:
-        type: string
-    docker:
-      - image: cimg/python:<< parameters.version >>
-      - image: cimg/redis:6.2.6
-
 jobs:
   build:
-    executor:
-      name: python-executor
-      version: << matrix.python_version >>
+    parameters:
+      python_version:
+        type: string
+    docker:
+      - image: cimg/python:<< parameters.python_version >>
+      - image: cimg/redis:6.2.6
     steps:
       - checkout
       - run:
@@ -28,6 +22,7 @@ workflows:
   build_and_test:
     jobs:
       - build:
+          name: unit-tests-cpython<< matrix.python_version >>
           matrix:
             parameters:
               python_version: ["3.8", "3.9", "3.10", "3.11"]
