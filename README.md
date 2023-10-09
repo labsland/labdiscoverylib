@@ -1,7 +1,7 @@
 # labdiscoverylib
 
 [![CircleCI](https://circleci.com/gh/labsland/labdiscoverylib.svg?style=svg)](https://circleci.com/gh/labsland/labdiscoverylib)
-[![documentation](https://raw.githubusercontent.com/labsland/labdiscoverylib/0.5.x/docs/source/_static/docs.svg)](https://developers.labsland.com/labdiscoverylib/)
+[![documentation](https://raw.githubusercontent.com/labsland/labdiscoverylib/main/docs/source/_static/docs.svg)](https://developers.labsland.com/labdiscoverylib/)
 [![Version](https://img.shields.io/pypi/v/labdiscoverylib.svg)](https://pypi.python.org/pypi/labdiscoverylib/)
 [![Python versions](https://img.shields.io/pypi/pyversions/labdiscoverylib.svg)](https://pypi.python.org/pypi/labdiscoverylib/)
 
