@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: pip install -r requirements.txt pytest
+          command: pip install -r requirements.txt pytest flask-socketio
       - run:
           name: Run tests
           command: pytest .
