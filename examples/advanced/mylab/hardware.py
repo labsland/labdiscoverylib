@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, print_function, division
-
 import os
 import time
 from mylab import weblab, redis

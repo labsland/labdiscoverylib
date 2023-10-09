@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import time
 from flask import Flask, session, url_for
 from flask_debugtoolbar import DebugToolbarExtension

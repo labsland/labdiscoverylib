@@ -32,12 +32,10 @@ provides:
 Please, check the examples in the examples folder in the github repo.
 """
 
-# Copyright 2017 onwards LabsLand Experimentia S.L.
+# Copyright 2023 onwards LabsLand Experimentia S.L.U.
 # This software is licensed under the GNU AGPL v3:
 # GNU Affero General Public License version 3 (see the file LICENSE)
 # Read in the documentation about the license
-
-from __future__ import unicode_literals, print_function, division
 
 import os
 import sys
@@ -60,8 +58,10 @@ import click
 import requests
 
 from flask import jsonify, request, current_app, redirect, \
-     url_for, g, session, after_this_request, render_template, Markup, \
+     url_for, g, session, after_this_request, render_template, \
      has_request_context, has_app_context
+
+from markupsafe import Markup
 
 from labdiscoverylib.exc import WebLabError, NoContextError, InvalidConfigError, \
      WebLabNotInitializedError, TimeoutError, AlreadyRunningError, \

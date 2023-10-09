@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, print_function, division
-
 import time
 from flask import Flask, request, session, has_request_context
 from flask_assets import Environment
