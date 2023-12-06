@@ -5,8 +5,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-labdiscoverylib - 0.0.1
-=======================
+labdiscoverylib - 0.6
+=====================
 
 labdiscoverylib is a library for creating `LabDiscoveryEngine <https://github.com/labsland/labdiscoveryengine/>`_ remote laboratories.
 
