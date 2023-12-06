@@ -23,7 +23,7 @@ else:
 # >>> os.urandom(32)
 # to get new value.
 os.environ['SECRET_KEY']  = '\x18\xf2\xb0\x8d\x02\xef\xef\xf7@&H\xad\xb6\x91O\t,Y\xd4\\i\x15L)\x92\x8f\x14\x82\x86\xd5=&'
-os.environ['WEBLAB_USERNAME'] = 'weblabdeusto'
+os.environ['WEBLAB_USERNAME'] = 'lde'
 os.environ['WEBLAB_PASSWORD'] = 'password'
 
 from mylab import create_app

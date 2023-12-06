@@ -174,7 +174,7 @@ And obtain this information from outside:
    task = weblab.get_task(task_id)
    print(task.data['a'])
 
-When WebLab-Deusto calls to clean resources to your laboratory, **labdiscoverylib** will report
+When LabDiscoveryEngine calls to clean resources to your laboratory, **labdiscoverylib** will report
 of whether all the tasks assigned to the current session have finished or not, and no
 user will be assigned until the task is finished. So make sure that your task ends in time
 so as to not consume time of other users, and avoid starting tasks when the
@@ -395,8 +395,8 @@ Forbidden page
 
 By default, if a new user comes to your laboratory, he will see a simple ``Access forbidden`` message. However, you can do two other things:
 
- #. Forward the user to a link by adding ``WEBLAB_UNAUTHORIZED_LINK`` to ``config``. For example, typically here you will put a link to your public WebLab-Deusto system. If a user bookmarks the laboratory, he will be redirected to your WebLab-Deusto so he authenticates. In other scenarios, you might point to LabsLand, to your LMS (e.g., Moodle) or similar.
- #. Display another website. You can create a template in the ``templates`` folder and use it by adding the ``WEBLAB_UNAUTHORIZED_TEMPLATE`` variable. If you set it to ``forbidden.html``, you will see it in WebLab-Deusto.
+ #. Forward the user to a link by adding ``WEBLAB_UNAUTHORIZED_LINK`` to ``config``. For example, typically here you will put a link to your public LabDiscoveryEngine system. If a user bookmarks the laboratory, he will be redirected to your LabDiscoveryEngine so he authenticates. In other scenarios, you might point to LabsLand, to your LMS (e.g., Moodle) or similar.
+ #. Display another website. You can create a template in the ``templates`` folder and use it by adding the ``WEBLAB_UNAUTHORIZED_TEMPLATE`` variable. If you set it to ``forbidden.html``, you will see it in LabDiscoveryEngine.
 
 Timeout management
 ------------------
@@ -552,7 +552,7 @@ Internationalization (i18n)
 ---------------------------
 
 The object ``weblab_user`` has a ``locale`` parameter; which is ``None`` in the Anonymous
-user, but it's ``en``, ``es``... depending on what WebLab-Deusto said (which may come from
+user, but it's ``en``, ``es``... depending on what LabDiscoveryEngine said (which may come from
 the previous system, such as the LMS or Moodle).
 
 Therefore, if you are using ``Flask-Babel`` or ``Flask-BabelEx``, the script for selecting

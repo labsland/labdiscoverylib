@@ -13,7 +13,7 @@ You must run:
    $ flask weblab
    Usage: flask weblab [OPTIONS] COMMAND [ARGS]...
 
-     WebLab-Deusto related operations: initialize new sessions for development,
+     LabDiscoveryEngine related operations: initialize new sessions for development,
      run tasks, etc.
 
    Options:
@@ -90,10 +90,10 @@ This command does run in a loop.
       --help                  Show this message and exit.
 
 
-Faking users without WebLab-Deusto
-----------------------------------
+Faking users without LabDiscoveryEngine
+---------------------------------------
 
-You can use labdiscoverylib without WebLab-Deusto for development purposes. To do so, you can use
+You can use labdiscoverylib without LabDiscoveryEngine for development purposes. To do so, you can use
 this command so as to fake certain situations. Note that you must be in charge of making the
 proper requests (e.g., you can call twice the ``new`` method; and that's something that your
 laboratory might not support).
@@ -106,8 +106,8 @@ laboratory might not support).
 
       Fake user management.
 
-      With this interface, you can test your laboratory without WebLab-Deusto.
-      It implements the same methods used by WebLab-Deusto (create new user,
+      With this interface, you can test your laboratory without LabDiscoveryEngine.
+      It implements the same methods used by LabDiscoveryEngine (create new user,
       check status, kick out user), from a command line interface. The "new"
       command has several parameters for changing language, user name, etc.
 
@@ -116,13 +116,13 @@ laboratory might not support).
 
     Commands:
       dispose  End a session of a fake user.
-      new      Create a fake WebLab-Deusto user session.
+      new      Create a fake LabDiscoveryEngine user session.
       status   Check status of a fake user.
 
 New user
 ^^^^^^^^
 
-You can fake WebLab-Deusto requesting the status of the current user. All these parameters have
+You can fake LabDiscoveryEngine requesting the status of the current user. All these parameters have
 a default value. You can change them if you want (e.g., to test it in different languages, etc.).
 
 .. code-block:: shell
@@ -130,7 +130,7 @@ a default value. You can change them if you want (e.g., to test it in different 
     $ flask weblab fake new --help
     Usage: flask weblab fake new [OPTIONS]
 
-      Create a fake WebLab-Deusto user session.
+      Create a fake LabDiscoveryEngine user session.
 
       This command creates a new user session and stores the session in disk, so
       you can use other commands to check its status or delete it.
@@ -152,7 +152,7 @@ a default value. You can change them if you want (e.g., to test it in different 
 Check status
 ^^^^^^^^^^^^
 
-You can fake WebLab-Deusto requesting the status of the current user.
+You can fake LabDiscoveryEngine requesting the status of the current user.
 
 .. code-block:: shell
 
@@ -162,7 +162,7 @@ You can fake WebLab-Deusto requesting the status of the current user.
       Check status of a fake user.
 
       Once you create a user with flask "weblab fake new", you can use this
-      command to simulate the status method of WebLab-Deusto and see what it
+      command to simulate the status method of LabDiscoveryEngine and see what it
       would return.
 
     Options:
@@ -172,7 +172,7 @@ You can fake WebLab-Deusto requesting the status of the current user.
 Delete user
 ^^^^^^^^^^^
 
-You can fake WebLab-Deusto requesting to kick out the user.
+You can fake LabDiscoveryEngine requesting to kick out the user.
 
 .. code-block:: shell
 
@@ -182,7 +182,7 @@ You can fake WebLab-Deusto requesting to kick out the user.
       End a session of a fake user.
 
       Once you create a user with 'flask weblab fake new', you can use this
-      command to simulate the dispose method of WebLab-Deusto to kill the
+      command to simulate the dispose method of LabDiscoveryEngine to kill the
       current session.
 
     Options:

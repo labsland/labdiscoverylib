@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.config.update({
     'SECRET_KEY': 'something-random',
     'WEBLAB_CALLBACK_URL': '/mycallback',
-    'WEBLAB_USERNAME': 'weblabdeusto',
+    'WEBLAB_USERNAME': 'labdiscoveryengine',
     'WEBLAB_PASSWORD': 'secret',
 })
 

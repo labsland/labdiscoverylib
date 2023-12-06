@@ -438,13 +438,13 @@ However, this code is very far from being usable as a remote laboratory:
  * How does the administrator establish how long the student can access, etc.?
 
 For all these things, you can either implement and test everything by yourself, or rely on a remote
-laboratory management system, such as `WebLab-Deusto <https://weblabdeusto.readthedocs.org/>`_. Most
-of those features (administration, analytics, scheduling) are covered by WebLab-Deusto, but at some
-point WebLab-Deusto delegates on the particular laboratories by sending them users. So for example a
-user will be authenticated in WebLab-Deusto, and attempt to access the laboratory, and still
-WebLab-Deusto will be dealing with the queue of users. When the user finally has permission to use
-the laboratory in that particular time, then WebLab-Deusto contacts the laboratory telling it in a
-secure way "I'm WebLab-Deusto, I have this particular student, get ready for it".
+laboratory management system, such as `LabDiscoveryEngine <https://developers.labsland.com/labdiscoveryengine/en/stable/>`_. Most
+of those features (administration, analytics, scheduling) are covered by LabDiscoveryEngine, but at some
+point LabDiscoveryEngine delegates on the particular laboratories by sending them users. So for example a
+user will be authenticated in LabDiscoveryEngine, and attempt to access the laboratory, and still
+LabDiscoveryEngine will be dealing with the queue of users. When the user finally has permission to use
+the laboratory in that particular time, then LabDiscoveryEngine contacts the laboratory telling it in a
+secure way "I'm LabDiscoveryEngine, I have this particular student, get ready for it".
 
 The laboratory still has to implement this protocol and life cycle. And here is where **labdiscoverylib**
 enters, by implementing the protocol and making it easy for laboratory developers to focus on the
@@ -508,7 +508,7 @@ particular Flask view is only available for WebLab users:
 In this case, you are defining that the three views ``status`` and ``light`` can only be accessed by
 active WebLab users (users who have been assigned and whose time in the laboratory is not over).
 
-Additionally, we need to tell WebLab-Deusto what is the landing page when an experiment has been reserved,
+Additionally, we need to tell LabDiscoveryEngine what is the landing page when an experiment has been reserved,
 and we do it by adding the following code:
 
 .. code-block:: python
@@ -522,21 +522,21 @@ and we do it by adding the following code:
        # user has to land
        return url_for('index')
 
-This way, WebLab-Deusto will be managing students and the queue of students, and whenever it's time to
+This way, LabDiscoveryEngine will be managing students and the queue of students, and whenever it's time to
 access the laboratory, it will contact the laboratory, create a session for the user, initialize it in the
 user browser, and redirect the user to that (the one defined in ``initial_url``).
 
 Polling
 ~~~~~~~
 
-In WebLab-Deusto the administrator has assigned a time for the students. Let's imagine that it's
+In LabDiscoveryEngine the administrator has assigned a time for the students. Let's imagine that it's
 10 minutes per user. Typically, students leave earlier than the assigned time. For example, if they're
 learning how to write code for a robot, they might see that the robot has already failed in 30 seconds and
 might not need to continue suing it. However, if it works, they might need to stay 3 minutes or so. And if
 the lesson is a very complex one, then they might need the 10 minutes.
 
 For this reason, you might need to keep track of when is the user using the laboratory, and whenever the
-student leaves, report WebLab-Deusto that the user left. With **labdiscoverylib**, this process is almost
+student leaves, report LabDiscoveryEngine that the user left. With **labdiscoverylib**, this process is almost
 automatic: you have to call a ``poll`` function in less than 15 seconds (or whatever you setup in
 the ``WEBLAB_TIMEOUT`` configuration). There are different ways to achieve this. The simplest is adding
 ``weblab_poll_script`` in your template file as follows:
@@ -559,7 +559,7 @@ Internally, it will create a JavaScript script that will call a ``poll`` method 
 important thing is that this is called AFTER including ``jQuery`` since it relies on ``jQuery``.
 
 This way, whenever the student leaves the laboratory (actively, or because there was a network issue on his
-side, or for any other reason), the laboratory marks him as logged out, and therefore WebLab-Deusto assigns
+side, or for any other reason), the laboratory marks him as logged out, and therefore LabDiscoveryEngine assigns
 the laboratory to someone else.
 
 However, if you want to make this process faster, you can implement a method such as:
@@ -574,7 +574,7 @@ However, if you want to make this process faster, you can implement a method suc
        logout()
        return jsonify(result="ok")
 
-This way, you can create in HTML a code that actively tells in a faster way to WebLab-Deusto that the user
+This way, you can create in HTML a code that actively tells in a faster way to LabDiscoveryEngine that the user
 is finished.
 
 You can also call this automatically when the web browser closes or moves to another link by adding this
@@ -616,14 +616,14 @@ So as to distinguish the type of user, you have two properties:
 
 Additionally, both the ``CurrentUser`` and the ``ExpiredUser`` have the following properties:
 
- * ``username``: the username in the original system. For example, ``tom``. Note that this is not unique: if your WebLab-Deusto is sharing the laboratory with a Moodle, there might be a ``tom`` in WebLab-Deusto and another ``tom`` in Moodle, and in both cases ``weblab_user.username`` will be ``tom``. So you can use it to talk to the username, but not for saving information for this user.
+ * ``username``: the username in the original system. For example, ``tom``. Note that this is not unique: if your LabDiscoveryEngine is sharing the laboratory with a Moodle, there might be a ``tom`` in LabDiscoveryEngine and another ``tom`` in Moodle, and in both cases ``weblab_user.username`` will be ``tom``. So you can use it to talk to the username, but not for saving information for this user.
  * ``username_unique``: a full, unique, identifier of the user. For example, ``tom@school1@labsland``. Compared to the previous version, this is guaranteed to be unique.
  * ``back``: this is the URL where the user should go *after* finishing using the laboratory. For example, if the student was in a Moodle system, the ``back`` will be a link to the particular page in that Moodle system. ``requires_active`` by default redirects the user to that URL when the user has been logged in and not anymore.
- * ``time_left``: this is the time, in seconds, to finish the session. If the user was assigned 10 minutes, and 2 minutes have been passed, it will return something like ``478.3`` (seconds). Take into account that for this number to be accurate, both the laboatory server and the WebLab-Deusto server must have the same date and time, so use any time synchronization tool (e.g., a ntp server) to make sure this is the case.
+ * ``time_left``: this is the time, in seconds, to finish the session. If the user was assigned 10 minutes, and 2 minutes have been passed, it will return something like ``478.3`` (seconds). Take into account that for this number to be accurate, both the laboatory server and the LabDiscoveryEngine server must have the same date and time, so use any time synchronization tool (e.g., a ntp server) to make sure this is the case.
  * ``start_date``: UNIX timestamp of the second (according to WebLab) when the reservation started.
  * ``data``: this is some data that you can store for passing between the different methods, tasks, etc. This information must be basic data types (such as dicts, lists, numbers, strings... anything you can encode in JSON), and not your own objects or similar. By default, if you use it in a Flask view or in ``on_start``, whatever you put there will be automatically stored at the end of the view. You can force to store / retrieve the data by calling ``weblab_user.data.store()`` or ``weblab_user.data.retrieve()``.
- * ``locale``: this represents the language according to WebLab-Deusto (which will delegate in external systems too). For example, if you are using Moodle in Spanish, it will tell WebLab-Deusto that it's the case, which will establish here ``es``. You can use this with the proper library (such as Flask-Babel or Flask-BabelEx), as explained in :ref:`internationalization`.
- * ``request_client_data`` and ``request_server_data``: both provided by WebLab-Deusto (one coming from the client, the other from curated data by the WebLab-Deusto server; same as data in ``on_start``).
+ * ``locale``: this represents the language according to LabDiscoveryEngine (which will delegate in external systems too). For example, if you are using Moodle in Spanish, it will tell LabDiscoveryEngine that it's the case, which will establish here ``es``. You can use this with the proper library (such as Flask-Babel or Flask-BabelEx), as explained in :ref:`internationalization`.
+ * ``request_client_data`` and ``request_server_data``: both provided by LabDiscoveryEngine (one coming from the client, the other from curated data by the LabDiscoveryEngine server; same as data in ``on_start``).
 
 For example:
 
@@ -754,19 +754,19 @@ There are two mandatory variables that you have to configure in labdiscoverylib:
 .. tabularcolumns:: |p{6.5cm}|p{8.5cm}|
 
 ================================= =========================================
-``WEBLAB_USERNAME``               WebLab-Deusto has a pair of credentials
-                                  representing a particular WebLab-Deusto
+``WEBLAB_USERNAME``               LabDiscoveryEngine has a pair of credentials
+                                  representing a particular LabDiscoveryEngine
                                   instance in a particular laboratory.
                                   These pair are a *username* and a
                                   *password*, but they represent
-                                  WebLab-Deusto, **not** the particular
-                                  user coming from WebLab-Deusto. In
-                                  WebLab-Deusto, this property is called
+                                  LabDiscoveryEngine, **not** the particular
+                                  user coming from LabDiscoveryEngine. In
+                                  LabDiscoveryEngine, this property is called
                                   ``http_experiment_username``.
 ``WEBLAB_PASSWORD``               Same as ``WEBLAB_USERNAME``, but this
                                   property representing the
                                   ``http_experiment_password``
-                                  configuration value of WebLab-Deusto.
+                                  configuration value of LabDiscoveryEngine.
 ================================= =========================================
 
 So, for example, we could use:
@@ -776,7 +776,7 @@ So, for example, we could use:
    app = Flask(__name__)
    app.config.update({
        'SECRET_KEY': 'something-random',
-       'WEBLAB_USERNAME': 'weblabdeusto',
+       'WEBLAB_USERNAME': 'lde',
        'WEBLAB_PASSWORD': 'password',
    })
 
@@ -805,7 +805,7 @@ To do so, you can modify the ``hardware.py`` file to support:
 And, in ``laboratory.py``, move ``import hardware`` to the end of the file.
 
 This way, for each user, this code will be run once at the beginning. If an error is produced in your ``start`` method,
-the user will not be redirected and WebLab-Deusto will consider the laboratory as broken for a while before sending other
+the user will not be redirected and LabDiscoveryEngine will consider the laboratory as broken for a while before sending other
 user.
 
 The ``@weblab.on_dispose`` method is guaranteed to be run at some point in a matter of seconds or minutes after the user
@@ -861,7 +861,7 @@ Running labdiscoverylib
 -----------------------
 
 So far, you have seen what code to put, but you have not even installed **labdiscoverylib**, so you could not run it. Also,
-there are two ways to run this code: from WebLab-Deusto or, in development environments, from the console directly.
+there are two ways to run this code: from LabDiscoveryEngine or, in development environments, from the console directly.
 This section is focused on installing and running this code.
 
 Installing labdiscoverylib
@@ -876,8 +876,8 @@ So as to install **labdiscoverylib**, you only have to activate the same virtual
 
 .. note::
 
-   If you have installed WebLab-Deusto in this computer, please use a different virtual environment to
-   avoid any potential conflict. For example, if you installed WebLab-Deusto in a virtualenv called
+   If you have installed LabDiscoveryEngine in this computer, please use a different virtual environment to
+   avoid any potential conflict. For example, if you installed LabDiscoveryEngine in a virtualenv called
    weblab, create another virtualenv for labdiscoverylib:
 
    .. code-block:: shell
@@ -915,10 +915,10 @@ However, if you open the web browser and go to the laboratory site:
 
 You will only see ``Access forbidden``. So as to access the laboratory, you have to either:
 
- * Install WebLab-Deusto, follow `these instructions <http://weblabdeusto.readthedocs.io/en/latest/remote_lab_deployment.html>`_ (in particular, the *Unmanaged server* section, and configure with the following parameters:
-   * ``http_experiment_url: http://localhost:5000/``
-   * ``http_experiment_username: weblabdeusto`` (or whatever you used in ``WEBLAB_USERNAME``)
-   * ``http_experiment_password: password``  (or whatever you used in ``WEBLAB_PASSWORD``)
+ * Install LabDiscoveryEngine, follow `these instructions <http://developers.labsland.com/en/stable/>`_ (and configure the resource with the following parameters:
+   * ``url: http://localhost:5000/``
+   * ``login: lde`` (or whatever you used in ``WEBLAB_USERNAME``)
+   * ``password: password``  (or whatever you used in ``WEBLAB_PASSWORD``)
  * **OR** use the command line interface for debugging.
 
 The former is mandatory for the production mode, but the latter is the easiest version when working with. In this case, you simply run the following in a different terminal:
@@ -929,16 +929,16 @@ The former is mandatory for the production mode, but the latter is the easiest v
    $ export FLASK_APP=laboratory.py
    $ flask weblab fake new
 
-This fakes a request from WebLab-Deusto, creating a new user. By default, it opens a session your default web browser (check `more information on how thisworks <https://docs.python.org/2/library/webbrowser.html>`_ if it uses a web browser you don't want). You can avoid this by adding ``--dont-open-browser``.
+This fakes a request from LabDiscoveryEngine, creating a new user. By default, it opens a session your default web browser (check `more information on how thisworks <https://docs.python.org/2/library/webbrowser.html>`_ if it uses a web browser you don't want). You can avoid this by adding ``--dont-open-browser``.
 
-As you see, you will end in http://localhost:5000/ but with a working valid WebLab-Deusto session. ``weblab fake new`` uses some default parameters, that you can change:
+As you see, you will end in http://localhost:5000/ but with a working valid LabDiscoveryEngine session. ``weblab fake new`` uses some default parameters, that you can change:
 
 .. code-block:: shell
 
    $ flask weblab fake new --help
    Usage: flask weblab fake new [OPTIONS]
 
-     Create a fake WebLab-Deusto user session.
+     Create a fake LabDiscoveryEngine user session.
 
      This command creates a new user session and stores the session in disk, so
      you can use other commands to check its status or delete it.
@@ -996,7 +996,7 @@ You can also fake stopping the current session by running:
 
 It will delete the current session, so in the next ``weblab_user``, it will be already an ``ExpiredUser``.
 
-You can also fake what's the current status as WebLab-Deusto does, contacting your laboratory every few seconds:
+You can also fake what's the current status as LabDiscoveryEngine does, contacting your laboratory every few seconds:
 
 .. code-block:: shell
 
@@ -1007,7 +1007,7 @@ Which will return a number indicating when you should contact again, in seconds.
 Production
 ~~~~~~~~~~
 
-In a production environment, you should always use WebLab-Deusto, and you can rely on the `Flask deployment documentation <http://flask.pocoo.org/docs/0.12/deploying/>`_ to see how to deploy it.
+In a production environment, you should always use LabDiscoveryEngine, and you can rely on the `Flask deployment documentation <http://flask.pocoo.org/docs/0.12/deploying/>`_ to see how to deploy it.
 
 In the `advanced example in the github repository <https://github.com/labsland/labdiscoverylib/tree/master/examples/advanced>`_ you have two scripts to run it using the popular `gunicorn <http://gunicorn.org/>`_ web server. These files are `wsgi_app.py` and `gunicorn_start.sh`, and you can install gunicorn by running:
 

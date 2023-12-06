@@ -25,7 +25,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='labdiscoverylib',
-      version='0.1.0',
+      version='0.6.0',
       description="LabDiscoveryEngine library for creating unmanaged laboratories",
       long_description=long_description,
       long_description_content_type="text/markdown",

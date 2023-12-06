@@ -21,7 +21,7 @@ In Microsoft Windows:
  C:\...\> flask run
 ```
 
-And you can test it using [WebLab-Deusto](https://weblabdeusto.readthedocs.org) or using the labdiscoverylib command line interface in other terminal:
+And you can test it using [LabDiscoveryEngine](https://developers.labsland.com/labdiscoveryengine/en/stable/) or using the labdiscoverylib command line interface in other terminal:
 
 ```shell
 

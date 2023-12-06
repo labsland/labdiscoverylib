@@ -186,7 +186,7 @@ or in Windows:
 ```
 
 
-And you can test it using [WebLab-Deusto](https://weblabdeusto.readthedocs.org) or using the labdiscoverylib command line interface in other terminal:
+And you can test it using [LabDiscoveryEngine](https://developers.labsland.com/labdiscoveryengine/) or using the labdiscoverylib command line interface in other terminal:
 
 ```shell
 
@@ -208,5 +208,5 @@ Then, you have to have a file such as `wsgi_app.py`. Important: change all the v
 
 Once you change it, you can run a script like `gunicorn_start.sh`. Furthermore, this script is prepared to be launched from [supervisor](http://supervisord.org/).
 
-Finally, you have further information on WebLab-Deusto for unmanaged servers [in the official documentation](http://weblabdeusto.readthedocs.io/en/latest/#remote-laboratory-development-and-management).
+Finally, you have further information on LabDiscoveryEngine [in the official documentation](http://developers.labsland.com/labdiscoveryengine/).
 

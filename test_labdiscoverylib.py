@@ -50,7 +50,7 @@ class BaseWebLabTest(unittest.TestCase):
     def get_config(self):
         return {
             'SECRET_KEY': 'super-secret',
-            'WEBLAB_USERNAME': 'weblabdeusto',
+            'WEBLAB_USERNAME': 'lde',
             'WEBLAB_PASSWORD': 'password',
             'SERVER_NAME': self.server_name,
             'WEBLAB_SCHEME': 'https',
@@ -66,10 +66,10 @@ class BaseWebLabTest(unittest.TestCase):
         self.server_name = 'localhost:5000'
         self.app.config.update(self.get_config())
         self.auth_headers = {
-            'Authorization': 'Basic ' + base64.encodebytes(b'weblabdeusto:password').decode('utf8').strip(),
+            'Authorization': 'Basic ' + base64.encodebytes(b'lde:password').decode('utf8').strip(),
         }
         self.wrong_auth_headers = {
-            'Authorization': 'Basic ' + base64.encodebytes(b'wrong_weblabdeusto:wrong_password').decode('utf8').strip(),
+            'Authorization': 'Basic ' + base64.encodebytes(b'wrong_lde:wrong_password').decode('utf8').strip(),
         }
 
         @self.weblab.task(unique='global')
@@ -1274,7 +1274,7 @@ class WebLabConfigErrorsTest(unittest.TestCase):
     def test_callback(self):
         self._check_error({
                 'WEBLAB_CALLBACK_URL': '',
-                'WEBLAB_USERNAME': 'weblabdeusto',
+                'WEBLAB_USERNAME': 'lde',
                 'WEBLAB_PASSWORD': 'password',
                 'SERVER_NAME': 'localhost:5000',
             }, ValueError, "Empty URL")
@@ -1287,7 +1287,7 @@ class WebLabConfigErrorsTest(unittest.TestCase):
 
     def test_password(self):
         self._check_error({
-                'WEBLAB_USERNAME': 'weblabdeusto',
+                'WEBLAB_USERNAME': 'lde',
                 'SERVER_NAME': 'localhost:5000',
             }, ValueError, "Missing WEBLAB_PASSWORD")
 
@@ -1303,7 +1303,7 @@ class WebLabSetupErrorsTest(unittest.TestCase):
         app.config.update({
             'WEBLAB_BASE_URL': '/mylab/',
             'WEBLAB_CALLBACK_URL': '/mylab/callback/',
-            'WEBLAB_USERNAME': 'weblabdeusto',
+            'WEBLAB_USERNAME': 'lde',
             'WEBLAB_PASSWORD': 'password',
             'SERVER_NAME': 'localhost:5000',
         })
@@ -1314,7 +1314,7 @@ class WebLabSetupErrorsTest(unittest.TestCase):
     def test_missing_server_name(self):
         app = Flask(__name__)
         app.config.update({
-            'WEBLAB_USERNAME': 'weblabdeusto',
+            'WEBLAB_USERNAME': 'lde',
             'WEBLAB_PASSWORD': 'password',
         })
         with StdWrap():
@@ -1329,7 +1329,7 @@ class WebLabSetupErrorsTest(unittest.TestCase):
     def test_app_twice(self):
         app = Flask(__name__)
         app.config.update({
-            'WEBLAB_USERNAME': 'weblabdeusto',
+            'WEBLAB_USERNAME': 'lde',
             'WEBLAB_PASSWORD': 'password',
             'SERVER_NAME': 'localhost:5000',
         })
@@ -1340,7 +1340,7 @@ class WebLabSetupErrorsTest(unittest.TestCase):
     def test_app_twice_different_apps(self):
         app1 = Flask(__name__)
         app1.config.update({
-            'WEBLAB_USERNAME': 'weblabdeusto',
+            'WEBLAB_USERNAME': 'lde',
             'WEBLAB_PASSWORD': 'password',
             'SERVER_NAME': 'localhost:5000',
         })
@@ -1355,7 +1355,7 @@ class WebLabSetupErrorsTest(unittest.TestCase):
     def test_app_no_thread_and_auto_clean(self):
         app = Flask(__name__)
         app.config.update({
-            'WEBLAB_USERNAME': 'weblabdeusto',
+            'WEBLAB_USERNAME': 'lde',
             'WEBLAB_PASSWORD': 'password',
             'SERVER_NAME': 'localhost:5000',
             'WEBLAB_NO_THREAD': True,
@@ -1371,7 +1371,7 @@ class WebLabSetupErrorsTest(unittest.TestCase):
     def test_app_no_thread_and_task_threads(self):
         app = Flask(__name__)
         app.config.update({
-            'WEBLAB_USERNAME': 'weblabdeusto',
+            'WEBLAB_USERNAME': 'lde',
             'WEBLAB_PASSWORD': 'password',
             'SERVER_NAME': 'localhost:5000',
             'WEBLAB_NO_THREAD': True,
@@ -1387,7 +1387,7 @@ class WebLabSetupErrorsTest(unittest.TestCase):
     def test_app_two_weblabs_same_app(self):
         app = Flask(__name__)
         app.config.update({
-            'WEBLAB_USERNAME': 'weblabdeusto',
+            'WEBLAB_USERNAME': 'lde',
             'WEBLAB_PASSWORD': 'password',
             'WEBLAB_BASE_URL': '/foo',
             'SERVER_NAME': 'localhost:5000',
@@ -1404,7 +1404,7 @@ class WebLabSetupErrorsTest(unittest.TestCase):
         app = Flask(__name__)
         app.config.update({
             'WEBLAB_CALLBACK_URL': '/mylab/callback',
-            'WEBLAB_USERNAME': 'weblabdeusto',
+            'WEBLAB_USERNAME': 'lde',
             'WEBLAB_PASSWORD': 'password',
             'SERVER_NAME': 'localhost:5000',
         })
@@ -1423,7 +1423,7 @@ class WebLabSetupErrorsTest(unittest.TestCase):
     def _create_weblab(self):
         self.app = Flask(__name__)
         self.app.config.update({
-            'WEBLAB_USERNAME': 'weblabdeusto',
+            'WEBLAB_USERNAME': 'lde',
             'WEBLAB_PASSWORD': 'password',
             'SERVER_NAME': 'localhost:5000',
         })

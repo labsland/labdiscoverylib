@@ -16,7 +16,7 @@ class Config(object):
 
     # You should also store these credentials somewhere safer, like in the
     # same script as in the SECRET_KEY (in wsgi_app.py, not here)
-    WEBLAB_USERNAME = os.environ.get('WEBLAB_USERNAME') or 'weblabdeusto'
+    WEBLAB_USERNAME = os.environ.get('WEBLAB_USERNAME') or 'lde'
     WEBLAB_PASSWORD = os.environ.get('WEBLAB_PASSWORD') or 'password'
 
     # If an unauthorized user comes in, redirect him to this link

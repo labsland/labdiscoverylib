@@ -5,24 +5,24 @@ Configuration values
 
 The following are the configuration variables of **labdiscoverylib**:
 
-WebLab-Deusto
--------------
+LabDiscoveryEngine
+------------------
 
 .. tabularcolumns:: |p{6.5cm}|p{8.5cm}|
 
 ================================= =========================================
-``WEBLAB_USERNAME``               WebLab-Deusto credentials. It is not the
+``WEBLAB_USERNAME``               LabDiscoveryEngine credentials. It is not the
                                   username of the new user: it represents
-                                  the system itself (e.g., the WebLab-Deusto
+                                  the system itself (e.g., the LabDiscoveryEngine
                                   system calling). **Mandatory**
-``WEBLAB_PASSWORD``               WebLab-Deusto credentials. Read also
+``WEBLAB_PASSWORD``               LabDiscoveryEngine credentials. Read also
                                   ``WEBLAB_USERNAME``. **Mandatory**
-``WEBLAB_POLL_INTERVAL``          WebLab-Deusto is connecting every few seconds
+``WEBLAB_POLL_INTERVAL``          LabDiscoveryEngine is connecting every few seconds
                                   to the laboratory asking if the user is still
                                   alive or if he left. By default, 5 seconds.
                                   You can regulate it with this configuration
                                   variable. Note that if you establish ``0``,
-                                  then WebLab-Deusto will not ask again and
+                                  then LabDiscoveryEngine will not ask again and
                                   will wait until the end of the cycle.
 ================================= =========================================
 
@@ -82,7 +82,7 @@ Session management
                                   expired -after an hour-, by default finds an
                                   ``Access forbidden`` message. You can put
                                   a link here to redirect him to a different
-                                  URL (such as your WebLab-Deusto system, so
+                                  URL (such as your LabDiscoveryEngine system, so
                                   the student is forced to log in).
 ``WEBLAB_UNAUTHORIZED_TEMPLATE``  Same as ``WEBLAB_UNAUTHORIZED_LINK``, but
                                   instead of redirecting, it renders a template.

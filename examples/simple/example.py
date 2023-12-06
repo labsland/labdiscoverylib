@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 # XXX: IMPORTANT SETTINGS TO CHANGE
 app.config['SECRET_KEY'] = 'something random' # e.g., run: os.urandom(32) and put the output here
-app.config['WEBLAB_USERNAME'] = 'weblabdeusto' # This is the http_username you put in WebLab-Deusto
+app.config['WEBLAB_USERNAME'] = 'lde' # This is the http_username you put in WebLab-Deusto
 app.config['WEBLAB_PASSWORD'] = 'password'  # This is the http_password you put in WebLab-Deusto
 
 # XXX You should change...

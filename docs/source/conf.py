@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'labdiscoverylib'
-copyright = u'2017, LabsLand'
+copyright = u'2023, LabsLand'
 author = u'LabsLand'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -115,7 +115,7 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    'github_user': 'weblabdeusto',
+    'github_user': 'labsland',
     'github_repo': 'labdiscoverylib',
     'github_banner': True,
     'fixed_sidebar': True,

@@ -11,7 +11,7 @@ A remote laboratory is a software and hardware system that enables students to a
 For example, a student can be learning how to program a robot by writing code in a computer at home and sending it to a remote laboratory, where the student can see how the program behaves in a real environment.
 
 Creating a remote laboratory may imply many layers, such as authentication, authorization, scheduling, etc., so Remote Laboratory Management Systems (RLMS) were created to make the common layers of remote laboatories.
-WebLab-Deusto is an Open Source RLMS, and it has multiple ways ([see the docs](https://weblabdeusto.readthedocs.org)) to create a remote laboratory (in different programming languages, etc.).
+WebLab-Deusto is an Open Source RLMS, and it has multiple ways ([see the docs](https://developers.labsland.com/labdiscoveryengine/en/stable/)) to create a remote laboratory (in different programming languages, etc.).
 
 In the case of Python, with the popular [Flask](http://flask.pocoo.org) microframework, **labdiscoverylib** is the wrapper used to create *unmanaged labs*.
 *Unmanaged labs* is a term used in WebLab-Deusto to refer laboratories where the authors develop the full stack (server, client, deployment), as opposed to *managed labs*.
@@ -38,7 +38,7 @@ from labdiscoverylib import WebLab, weblab_user, requires_active
 app = Flask(__name__)
 app.config.update({
     'SECRET_KEY': 'secret', # MUST CHANGE
-    'WEBLAB_USERNAME': 'weblabdeusto',
+    'WEBLAB_USERNAME': 'lde',
     'WEBLAB_PASSWORD': 'password',
 })
 
