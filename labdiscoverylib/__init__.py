@@ -52,7 +52,6 @@ import webbrowser
 
 from functools import wraps
 
-import six
 import redis
 import click
 import requests
@@ -447,14 +446,18 @@ class WebLab(object):
             if reload is None:
                 reload = current_app.debug
 
+            if reload:
+                print("reload temporaily not supported")
+                reload = False
+
             def run_loop():
                 if reload:
                     print("Running with reloader. Don't use this in production mode.")
                 self.loop(int(threads), reload)
 
             if reload:
-                from werkzeug.serving import run_with_reloader
-                run_with_reloader(run_loop)
+                # run_with_reloader(run_loop)
+                run_loop()
             else:
                 run_loop()
 
@@ -626,7 +629,7 @@ class WebLab(object):
 
             threads_per_process = self._app.config.get('WEBLAB_TASK_THREADS_PROCESS', 3)
             if threads_per_process > 0: # If set to 0, no thread is running
-                for number in six.moves.range(threads_per_process):
+                for number in range(threads_per_process):
                     task_thread = _TaskRunner(number, self, self._app)
                     self._task_threads.append(task_thread)
                     task_thread.start()

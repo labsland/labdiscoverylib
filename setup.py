@@ -41,5 +41,5 @@ setup(name='labdiscoverylib',
       url='https://developers.labsland.com/labdiscoverylib/',
       license=cp_license,
       packages=['labdiscoverylib', 'labdiscoverylib.backends'],
-      install_requires=['redis', 'flask', 'six', 'requests'],
+      install_requires=['redis', 'flask<3', 'werkzeug<3', 'six', 'requests'],
      )

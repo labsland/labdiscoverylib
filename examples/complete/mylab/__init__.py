@@ -35,9 +35,9 @@ def create_app(config_name):
     weblab.init_app(app)
     toolbar.init_app(app)
     redis.init_app(app)
-    babel.init_app(app)
+    babel.init_app(app, locale_selector=get_locale)
     assets.init_app(app)
-    socketio.init_app(app, message_queue='redis://', channel='mylab')
+    socketio.init_app(app, message_queue='redis://', channel='mylab', cors_allowed_origins="*")
 
     # Register the views
     from .views import main_blueprint
@@ -65,7 +65,6 @@ def create_app(config_name):
     # app is a valid Flask app
     return app
 
-@babel.localeselector
 def get_locale():
     """Defines what's the current language for the user. It uses different approaches"""
     # 'en' is supported by default

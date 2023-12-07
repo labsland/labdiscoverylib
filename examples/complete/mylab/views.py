@@ -56,7 +56,8 @@ def microcontroller(data):
 
     # If there are running tasks, don't let them send the program
     if len(weblab.running_tasks):
-        return jsonify(error=True, message="Other tasks being run")
+        emit(errormessage="error:other tasks being run", namespace='/mylab')
+        return
 
     task = program_device.delay(code)
 

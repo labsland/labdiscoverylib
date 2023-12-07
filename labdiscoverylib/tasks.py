@@ -8,7 +8,6 @@ import time
 import threading
 import traceback
 
-import six
 import redis
 
 from werkzeug.local import LocalProxy
@@ -396,8 +395,6 @@ class WebLabTask(object):
     def __repr__(self):
         """Represent a WebLab task"""
         representation = '<WebLab Task {}>'.format(self._task_id)
-        if six.PY2:
-            representation = representation.encode('utf8')
         return representation
 
     def __lt__(self, other):
@@ -457,7 +454,7 @@ class _TaskRunner(threading.Thread):
                 traceback.print_exc()
                 continue
 
-            for _ in six.moves.range(_TaskRunner._STEPS_WAITING):
+            for _ in range(_TaskRunner._STEPS_WAITING):
                 time.sleep(0.05)
                 if self._stopping:
                     break

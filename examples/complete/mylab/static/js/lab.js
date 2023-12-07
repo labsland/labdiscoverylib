@@ -1,5 +1,7 @@
 var namespace = '/mylab';
-var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+var address = location.protocol + '//' + document.domain + ':' + location.port + namespace
+console.log("Connecting to... " + address);
+var socket = io(address);
 
 function clean() {
     $("#panel").hide();

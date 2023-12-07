@@ -1,5 +1,5 @@
 python-socketio
 redis
-flask
-six
+flask<3 # pending
+werkzeug<3 # pending
 requests
