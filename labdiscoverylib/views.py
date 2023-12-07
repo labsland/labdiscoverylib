@@ -236,19 +236,20 @@ def _multiple_status():
     return jsonify(status=status)
 
 
-@weblab_blueprint.route('/sessions/<session_id>', methods=['POST'])
+@weblab_blueprint.route('/sessions/<session_id>', methods=['POST', 'DELETE'])
 def _dispose_experiment(session_id):
     """
     This method is called to kick one user out. This may happen
     when an administrator defines so, or when the assigned time
     is over.
     """
-    request_data = request.get_json(force=True)
-    if 'action' not in request_data:
-        return jsonify(message="Unknown op")
+    if request.method == 'POST':
+        request_data = request.get_json(force=True)
+        if 'action' not in request_data:
+            return jsonify(message="Unknown op")
 
-    if request_data['action'] != 'delete':
-        return jsonify(message="Unknown op")
+        if request_data['action'] != 'delete':
+            return jsonify(message="Unknown op")
 
     try:
         dispose_user(session_id, waiting=True)

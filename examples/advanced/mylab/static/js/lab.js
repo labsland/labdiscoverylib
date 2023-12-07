@@ -2,6 +2,7 @@ function clean() {
     $("#panel").hide();
     // No more time
     $("#timer").text("Time is over!");
+    $("#back-url").css("display", "block");
     running = false;
     currentTime = 0;
     clearInterval(STATUS_INTERVAL);
