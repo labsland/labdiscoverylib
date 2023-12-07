@@ -125,6 +125,8 @@ def _process_start_request(request_data):
     max_date = start_date + datetime.timedelta(seconds=slot_length)
     locale = request_data['request'].get('locale', 'en')
     full_name = request_data['user'].get('fullName')
+    username = request_data['user']['username']
+    username_unique = request_data['user']['unique']
 
     experiment_name = request_data['laboratory']['name']
     category_name = request_data['laboratory'].get('category')
@@ -143,8 +145,8 @@ def _process_start_request(request_data):
     user = CurrentUser(session_id=session_id, back=back_url,
                        last_poll=datetime.datetime.now(datetime.timezone.utc),
                        max_date=max_date,
-                       username=server_initial_data['request.username'],
-                       username_unique=server_initial_data['request.username.unique'],
+                       username=username,
+                       username_unique=username_unique,
                        exited=False, data={}, locale=locale,
                        full_name=full_name, experiment_name=experiment_name,
                        experiment_id=experiment_id, category_name=category_name,
@@ -154,7 +156,7 @@ def _process_start_request(request_data):
 
     backend = _current_backend()
 
-    backend.add_user(session_id, user, expiration=30 + int(float(server_initial_data['priority.queue.slot.length'])))
+    backend.add_user(session_id, user, expiration=30 + int(float(slot_length)))
 
 
     kwargs = {}

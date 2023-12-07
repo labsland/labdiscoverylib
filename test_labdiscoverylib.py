@@ -140,7 +140,11 @@ class BaseWebLabTest(unittest.TestCase):
         self.current_task = task
 
     def get_json(self, rv):
-        return json.loads(rv.get_data(as_text=True))
+        data = rv.get_data(as_text=True)
+        try:
+            return json.loads(data)
+        except Exception as e:
+            raise Exception(f"Error loading json: {e} in {data}")
 
     def get_text(self, rv):
         return rv.get_data(as_text=True)
@@ -166,31 +170,31 @@ class BaseWebLabTest(unittest.TestCase):
 class WebLabApiTest(BaseWebLabTest):
     def test_api(self):
         with self.app.test_client() as client:
-            result = self.get_json(client.get('/weblab/sessions/api'))
+            result = self.get_json(client.get('/ldl/sessions/api'))
             self.assertEquals(result['api_version'], '1')
 
     def test_weblab_test_without_auth(self):
         with self.app.test_client() as client:
-            result = self.get_json(client.get('/weblab/sessions/test'))
+            result = self.get_json(client.get('/ldl/sessions/test'))
             self.assertEquals(result['valid'], False)
             self.assertIn("no username", result['error_messages'][0])
 
     def test_weblab_test_with_wrong_auth(self):
         with StdWrap():
             with self.app.test_client() as client:
-                result = self.get_json(client.get('/weblab/sessions/test', headers=self.wrong_auth_headers))
+                result = self.get_json(client.get('/ldl/sessions/test', headers=self.wrong_auth_headers))
                 self.assertEquals(result['valid'], False)
                 self.assertIn("wrong username", result['error_messages'][0])
 
     def test_weblab_test_with_right_auth(self):
         with self.app.test_client() as client:
-            result = self.get_json(client.get('/weblab/sessions/test', headers=self.auth_headers))
+            result = self.get_json(client.get('/ldl/sessions/test', headers=self.auth_headers))
             self.assertEquals(result['valid'], True)
 
     def test_weblab_status_with_wrong_auth(self):
         with StdWrap():
             with self.app.test_client() as client:
-                result = self.get_text(client.get('/weblab/sessions/<invalid>/status', headers=self.wrong_auth_headers))
+                result = self.get_text(client.get('/ldl/sessions/<invalid>/status', headers=self.wrong_auth_headers))
                 self.assertIn("seem to be", result)
 
 class SimpleUnauthenticatedTest(BaseWebLabTest):
@@ -268,19 +272,19 @@ class SimpleUnauthenticatedTest(BaseWebLabTest):
         with self.app.test_client() as client:
             request_data = {
             }
-            rv = client.post('/weblab/sessions/{}'.format('foo'), data=json.dumps(request_data), headers=self.auth_headers)
+            rv = client.post('/ldl/sessions/{}'.format('foo'), data=json.dumps(request_data), headers=self.auth_headers)
             self.assertIn("Unknown", self.get_json(rv)['message'])
 
             request_data = {
                 'action': 'look at the mountains'
             }
-            rv = client.post('/weblab/sessions/{}'.format('foo'), data=json.dumps(request_data), headers=self.auth_headers)
+            rv = client.post('/ldl/sessions/{}'.format('foo'), data=json.dumps(request_data), headers=self.auth_headers)
             self.assertIn("Unknown", self.get_json(rv)['message'])
 
             request_data = {
                 'action': 'delete'
             }
-            rv = client.post('/weblab/sessions/{}'.format('does.not.exist'), data=json.dumps(request_data), headers=self.auth_headers)
+            rv = client.post('/ldl/sessions/{}'.format('does.not.exist'), data=json.dumps(request_data), headers=self.auth_headers)
             self.assertIn("Not found", self.get_json(rv)['message'])
 
 class SimpleNoTimeoutUnauthenticatedTest(BaseWebLabTest):
@@ -344,34 +348,41 @@ class BaseSessionWebLabTest(BaseWebLabTest):
         super(BaseSessionWebLabTest, self).tearDown()
 
     def new_user(self, name='Jim Smith', username='jim.smith', username_unique='jim.smith@labsland', 
-                 assigned_time=300, back='http://weblab.deusto.es', language='en',
+                 assigned_time=300, back='http://labsland.com', language='en',
                  experiment_name='mylab', category_name='Lab experiments', use_timestamp=True):
         assigned_time = float(assigned_time)
         
-        now = datetime.datetime.now().replace(microsecond=0)
-        start_time = now.strftime("%Y-%m-%d %H:%M:%S") + '.0'
-        self._start_time_float = _to_timestamp(now)
+        now = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0)
+        self._start_date = now
 
         request_data = {
-            'client_initial_data': {
-                'in_test': True,
+            'request': {
+                'locale': language,
+                'ldeReservationId': 'foobar',
+                'user': {
+                    'in_test': True,
+                },
+                'server': {
+                    'myvar': 'myvalue',
+                },
+                'backUrl': back,
             },
-            'server_initial_data': {
-                'priority.queue.slot.start': start_time,
-                'priority.queue.slot.length': assigned_time,
-                'request.username': username,
-                'request.full_name': name,
-                'request.username.unique': username_unique,
-                'request.locale': language,
-                'request.experiment_id.experiment_name': experiment_name,
-                'request.experiment_id.category_name': category_name,
+            'laboratory': {
+                'name': experiment_name,
+                'category': category_name,
             },
-            'back': back,
+            'user': {
+                'username': username,
+                'fullName': name,
+                'unique': username_unique,
+            },
+            'schedule': {
+                'start': now.isoformat(),
+                'length': assigned_time,
+            }
         }
-        if use_timestamp:
-            request_data['server_initial_data']['priority.queue.slot.start.timestamp'] = '%s' % self._start_time_float
 
-        rv = self.weblab_client.post('/weblab/sessions/', data=json.dumps(request_data), headers=self.auth_headers)
+        rv = self.weblab_client.post('/ldl/sessions/', data=json.dumps(request_data), headers=self.auth_headers)
         response = self.get_json(rv)
         if 'session_id' in response:
             self.session_id = response['session_id']
@@ -385,7 +396,7 @@ class BaseSessionWebLabTest(BaseWebLabTest):
         if session_id is None:
             session_id = self.session_id
 
-        rv = self.weblab_client.get('/weblab/sessions/{}/status'.format(session_id), headers=self.auth_headers)
+        rv = self.weblab_client.get('/ldl/sessions/{}/status'.format(session_id), headers=self.auth_headers)
         return self.get_json(rv)
 
     def dispose(self, session_id = None):
@@ -395,7 +406,7 @@ class BaseSessionWebLabTest(BaseWebLabTest):
         request_data = {
             'action': 'delete',
         }
-        rv = self.weblab_client.post('/weblab/sessions/{}'.format(session_id), data=json.dumps(request_data), headers=self.auth_headers)
+        rv = self.weblab_client.post('/ldl/sessions/{}'.format(session_id), data=json.dumps(request_data), headers=self.auth_headers)
         return self.get_json(rv)
 
 class UserTest(BaseSessionWebLabTest):
@@ -442,8 +453,8 @@ class UserTest(BaseSessionWebLabTest):
         self.assertEquals(labdiscoverylib.weblab_user.category_name, 'Lab experiments')
         self.assertEquals(labdiscoverylib.weblab_user.experiment_id, 'mylab@Lab experiments')
         self.assertEquals(labdiscoverylib.weblab_user.request_client_data['in_test'], True)
-        self.assertEquals(labdiscoverylib.weblab_user.request_server_data['request.username'], 'jim.smith')
-        self.assertEquals(labdiscoverylib.weblab_user.start_date, float(self._start_time_float))
+        self.assertEquals(labdiscoverylib.weblab_user.request_server_data['myvar'], 'myvalue')
+        self.assertEquals(labdiscoverylib.weblab_user.start_date, self._start_date)
 
         task_id = response.split('@@task@@')[1]
 
@@ -582,7 +593,7 @@ class UserTest(BaseSessionWebLabTest):
 
         # Even before cleaning expired users
         rv = self.client.get('/lab/active')
-        self.assertEquals(rv.location, 'http://weblab.deusto.es')
+        self.assertEquals(rv.location, 'http://labsland.com')
 
 
         self.weblab.clean_expired_users()
@@ -591,7 +602,7 @@ class UserTest(BaseSessionWebLabTest):
         self.dispose(session_id1)
 
         rv = self.client.get('/lab/active')
-        self.assertEquals(rv.location, 'http://weblab.deusto.es')
+        self.assertEquals(rv.location, 'http://labsland.com')
         
         self.client.get('/lab/')
         self.assertFalse(labdiscoverylib.weblab_user.active)

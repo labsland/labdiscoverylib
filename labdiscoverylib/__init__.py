@@ -498,9 +498,7 @@ class WebLab(object):
             can use other commands to check its status or delete it.
             """
             assigned_time = float(assigned_time)
-
-            start_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '.0'
-            start_time_timestamp = time.time()
+            start_time = datetime.datetime.now(datetime.timezone.utc)
             
             try:
                 client_initial_data_data = json.loads(client_initial_data)
@@ -515,17 +513,24 @@ class WebLab(object):
                     print("Error reading {}: {}".format(client_initial_data_file, err))
 
             request_data = {
-                'client_initial_data': client_initial_data_data,
-                'server_initial_data': {
-                    'priority.queue.slot.start': start_time,
-                    'priority.queue.slot.start.timestamp': start_time_timestamp,
-                    'priority.queue.slot.length': assigned_time,
-                    'request.username': username,
-                    'request.full_name': name,
-                    'request.username.unique': username_unique,
-                    'request.locale': locale,
-                    'request.experiment_id.experiment_name': experiment_name,
-                    'request.experiment_id.category_name': category_name,
+                'request': {
+                    'locale': locale,
+                    'user': client_initial_data_data,
+                    'server': {},
+                    'backUrl': back
+                },
+                'laboratory': {
+                    'name': experiment_name,
+                    'category': category_name,
+                },
+                'user': {
+                    'username': username,
+                    'fullName': name,
+                    'unique': username_unique,
+                },
+                'schedule': {
+                    'start': start_time.isoformat(),
+                    'length': assigned_time,
                 },
                 'back': back,
             }

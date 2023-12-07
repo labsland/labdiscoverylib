@@ -5,6 +5,7 @@
 
 import json
 import time
+import datetime
 
 import redis
 from flask import current_app
@@ -14,7 +15,7 @@ from labdiscoverylib.utils import create_token
 from labdiscoverylib.users import AnonymousUser, CurrentUser, ExpiredUser
 
 
-class RedisManager(object):
+class RedisManager:
     """
     To manage users, sessions and tasks.
 
@@ -39,7 +40,7 @@ class RedisManager(object):
 
         self.task_expires = task_expires
 
-    def add_user(self, session_id, user, expiration):
+    def add_user(self, session_id: str, user, expiration):
         """
         Adds a new user.
         This will:
@@ -63,7 +64,7 @@ class RedisManager(object):
         pipeline.hset(key, 'experiment_name', json.dumps(user.experiment_name))
         pipeline.hset(key, 'category_name', json.dumps(user.category_name))
         pipeline.hset(key, 'experiment_id', json.dumps(user.experiment_id))
-        pipeline.hset(key, 'start_date', user.start_date)
+        pipeline.hset(key, 'start_date', None if not user.start_date else user.start_date.isoformat())
         pipeline.hset(key, 'request_client_data', json.dumps(user.request_client_data))
         pipeline.hset(key, 'request_server_data', json.dumps(user.request_server_data))
         pipeline.expire(key, expiration)
@@ -230,7 +231,7 @@ class RedisManager(object):
             if max_date is not None and last_poll is not None: 
                 # Double check: he might be deleted in the meanwhile
                 # We don't use 'active', since active takes into account 'exited'
-                now = datetime.datetime.now(datetime.timeformat.utc)
+                now = datetime.datetime.now(datetime.timezone.utc)
                 time_left = (datetime.datetime.fromisoformat(max_date) - now).total_seconds()
                 time_without_polling = (now - datetime.datetime.fromisoformat(last_poll)).total_seconds()
                 user_exited = exited in ('true', '1', 'True', 'TRUE')

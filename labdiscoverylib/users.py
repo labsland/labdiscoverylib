@@ -490,4 +490,4 @@ class ExpiredUser(_CurrentOrExpiredUser):
         return False
 
     def __str__(self):
-        return 'Expired user (id: {!r}): {!r} ({!r}), max date in {:.2f} seconds. Redirecting to {!r}'.format(self._session_id, self._username, self._username_unique, (self._max_date - utcnow()), self._back)
+        return 'Expired user (id: {!r}): {!r} ({!r}), max date in {:.2f} seconds. Redirecting to {!r}'.format(self._session_id, self._username, self._username_unique, (self._max_date - utcnow()).total_seconds(), self._back)
