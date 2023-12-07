@@ -6,6 +6,9 @@
     <div class="container">
         <div class="row">
             <h1>Welcome to <strong>mylab</strong>!</h1>
+            {% if resource %}
+            <h2>Resource: {{ resource }}</h2>
+            {% endif %}
         </div>
         <br>
 

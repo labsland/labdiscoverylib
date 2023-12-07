@@ -1,3 +1,5 @@
+import sys
+sys.path.append('../..') # labdiscoverylib
 import os
 from mylab import create_app
 

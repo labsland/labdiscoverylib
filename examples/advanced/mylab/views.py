@@ -1,3 +1,4 @@
+import os
 import time
 
 from flask import Blueprint, url_for, render_template, jsonify, session, current_app, request
@@ -26,7 +27,7 @@ def index():
     # CSRF attacks (check https://en.wikipedia.org/wiki/Cross-site_request_forgery )
     session['csrf'] = weblab.create_token()
 
-    return render_template("index.html")
+    return render_template("index.html", resource=os.environ.get('RESOURCE'))
 
 @main_blueprint.route('/status')
 @requires_active
