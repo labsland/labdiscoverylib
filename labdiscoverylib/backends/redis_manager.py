@@ -10,7 +10,7 @@ import redis
 from flask import current_app
 
 from labdiscoverylib.config import ConfigurationKeys
-from labdiscoverylib.utils import create_token, _current_timestamp
+from labdiscoverylib.utils import create_token
 from labdiscoverylib.users import AnonymousUser, CurrentUser, ExpiredUser
 
 
@@ -51,8 +51,8 @@ class RedisManager(object):
         key = '{}:weblab:active:{}'.format(self.key_base, session_id)
 
         pipeline = self.client.pipeline()
-        pipeline.hset(key, 'max_date', user.max_date)
-        pipeline.hset(key, 'last_poll', user.last_poll)
+        pipeline.hset(key, 'max_date', None if not user.max_date else user.max_date.isoformat())
+        pipeline.hset(key, 'last_poll', None if not user.last_poll else user.last_poll.isoformat())
         pipeline.hset(key, 'username', user.username)
         pipeline.hset(key, 'username-unique', user.username_unique)
         pipeline.hset(key, 'data', json.dumps(user.data))
@@ -109,8 +109,8 @@ class RedisManager(object):
          request_client_data, request_server_data, start_date) = pipeline.execute()
 
         if max_date is not None:
-            return CurrentUser(session_id=session_id, back=back, last_poll=float(last_poll),
-                               max_date=float(max_date), username=username,
+            return CurrentUser(session_id=session_id, back=back, last_poll=datetime.datetime.fromisoformat(last_poll),
+                               max_date=datetime.datetime.fromisoformat(max_date), username=username,
                                username_unique=username_unique,
                                data=json.loads(data), exited=json.loads(exited),
                                locale=json.loads(locale), full_name=json.loads(full_name),
@@ -118,7 +118,7 @@ class RedisManager(object):
                                category_name=json.loads(category_name),
                                request_client_data=json.loads(request_client_data),
                                request_server_data=json.loads(request_server_data),
-                               start_date=float(start_date),
+                               start_date=datetime.datetime.fromisoformat(start_date),
                                experiment_id=json.loads(experiment_id))
 
         return self.get_expired_user(session_id)
@@ -136,7 +136,10 @@ class RedisManager(object):
          request_client_data, request_server_data, start_date, disposing_resources) = pipeline.execute()
 
         if max_date is not None:
-            return ExpiredUser(session_id=session_id, last_poll=last_poll, back=back, max_date=float(max_date), exited=exited,
+            return ExpiredUser(session_id=session_id, 
+                               last_poll=datetime.datetime.fromisoformat(last_poll) if last_poll else None, 
+                               back=back, 
+                               max_date=datetime.datetime.fromisoformat(max_date), exited=exited,
                                username=username, username_unique=username_unique,
                                data=json.loads(data),
                                locale=json.loads(locale),
@@ -146,7 +149,7 @@ class RedisManager(object):
                                experiment_id=json.loads(experiment_id),
                                request_client_data=json.loads(request_client_data),
                                request_server_data=json.loads(request_server_data),
-                               start_date=float(start_date),
+                               start_date=datetime.datetime.fromisoformat(start_date),
                                disposing_resources=json.loads(disposing_resources))
 
         return AnonymousUser()
@@ -170,7 +173,7 @@ class RedisManager(object):
         key = '{}:weblab:inactive:{}'.format(self.key_base, session_id)
 
         pipeline.hset(key, "back", expired_user.back)
-        pipeline.hset(key, "max_date", expired_user.max_date)
+        pipeline.hset(key, "max_date", None if not expired_user.max_date else expired_user.max_date.isoformat())
         pipeline.hset(key, "username", expired_user.username)
         pipeline.hset(key, "username-unique", expired_user.username_unique)
         pipeline.hset(key, "data", json.dumps(expired_user.data))
@@ -181,7 +184,7 @@ class RedisManager(object):
         pipeline.hset(key, "experiment_id", json.dumps(expired_user.experiment_id))
         pipeline.hset(key, "request_client_data", json.dumps(expired_user.request_client_data))
         pipeline.hset(key, "request_server_data", json.dumps(expired_user.request_server_data))
-        pipeline.hset(key, "start_date", expired_user.start_date)
+        pipeline.hset(key, "start_date", None if not expired_user.start_date else expired_user.start_date.isoformat())
         pipeline.hset(key, "disposing_resources", json.dumps(True))
 
         # During half an hour after being created, the user is redirected to
@@ -227,9 +230,9 @@ class RedisManager(object):
             if max_date is not None and last_poll is not None: 
                 # Double check: he might be deleted in the meanwhile
                 # We don't use 'active', since active takes into account 'exited'
-
-                time_left = float(max_date) - _current_timestamp()
-                time_without_polling = _current_timestamp() - float(last_poll)
+                now = datetime.datetime.now(datetime.timeformat.utc)
+                time_left = (datetime.datetime.fromisoformat(max_date) - now).total_seconds()
+                time_without_polling = (now - datetime.datetime.fromisoformat(last_poll)).total_seconds()
                 user_exited = exited in ('true', '1', 'True', 'TRUE')
 
                 if time_left <= 0:
@@ -250,10 +253,10 @@ class RedisManager(object):
     def poll(self, session_id):
         key = '{}:weblab:active:{}'.format(self.key_base, session_id)
 
-        last_poll = _current_timestamp()
+        last_poll = datetime.datetime.now(datetime.timezone.utc)
         pipeline = self.client.pipeline()
         pipeline.hget(key, "max_date")
-        pipeline.hset(key, "last_poll", last_poll)
+        pipeline.hset(key, "last_poll", last_poll.isoformat())
         max_date, _ = pipeline.execute()
 
         if max_date is None:

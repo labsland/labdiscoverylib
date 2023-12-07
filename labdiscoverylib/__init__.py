@@ -2,10 +2,10 @@
 labdiscoverylib
 ~~~~~~~~~~~~~~~
 
-This library is a wrapper for developing unmanaged WebLab-Deusto remote laboratories. You may find
-documentation about WebLab-Deusto at:
+This library is a wrapper for developing unmanaged LabDiscoveryEngine remote laboratories. You may find
+documentation about LabDiscoveryEngine at:
 
-   https://weblabdeusto.readthedocs.org/
+   https://developers.labsland.com/labdiscoveryengine/
 
 And the documentation on labdiscoverylib at:
 
@@ -16,11 +16,11 @@ learn a bit about it first:
 
    http://flask.pocoo.org/
 
-The library is designed to forget about the integration with WebLab-Deusto and make it easy. It
+The library is designed to forget about the integration with LabDiscoveryEngine and make it easy. It
 provides:
 
  * A WebLab object. You must initialize it with the app. It will include a set of new web methods
-   that WebLab-Deusto uses. It also allows you to define what methods should be call on the
+   that LabDiscoveryEngine uses. It also allows you to define what methods should be call on the
    beginning and end of the user session.
 
  * A set of methods to access information about the current information, such as ``weblab_user``,
@@ -104,7 +104,7 @@ __license__ = 'GNU Affero General Public License v3 http://www.gnu.org/licenses/
 
 #############################################################
 #
-# WebLab-Deusto Flask extension:
+# LabDiscoveryEngine Flask extension:
 #
 #
 #
@@ -119,12 +119,12 @@ class WebLab(object):
     :param app: the Flask application
 
     :param base_url: the base URL to be used. By default, the WebLab URLs will be
-                     ``/weblab/sessions/<something>``.  If you provide ``base_url = '/foo'``, then
-                     it will be listening in ``/foo/weblab/sessions/<something>``. This is the
+                     ``/ldl/sessions/<something>``.  If you provide ``base_url = '/foo'``, then
+                     it will be listening in ``/foo/ldl/sessions/<something>``. This is the
                      route that will be used in the Flask application (so if your application
                      is deployed in ``/bar``, then it will be
-                     ``/bar/foo/weblab/sessions/<something>``. This URLs do NOT need to be
-                     publicly available (they can be only available to WebLab-Deusto if you
+                     ``/bar/foo/ldl/sessions/<something>``. This URLs do NOT need to be
+                     publicly available (they can be only available to LabDiscoveryEngine if you
                      want, by playing with the firewall or so). You can also configure it with
                      ``WEBLAB_BASE_URL`` in the Flask configuration.
 
@@ -244,11 +244,11 @@ class WebLab(object):
             self._base_url = self._app.config.get(ConfigurationKeys.WEBLAB_BASE_URL)
 
         if self._base_url:
-            url = '{}/weblab'.format(self._base_url)
+            url = '{}/ldl'.format(self._base_url)
             if self._base_url.endswith('/'):
                 print("Note: your base_url ({}) ends in '/'. This way, the url will be {} (with //). Are you sure that's what you want?".format(self._base_url, url), file=sys.stderr)
         else:
-            url = '/weblab'
+            url = '/ldl'
 
         self._app.register_blueprint(weblab_blueprint, url_prefix=url)
 
@@ -414,7 +414,7 @@ class WebLab(object):
         click.disable_unicode_literals_warning = True
         @app.cli.group('weblab')
         def weblab_cli():
-            """WebLab-Deusto related operations: initialize new sessions for development, run tasks, etc."""
+            """LabDiscoveryEngine related operations: initialize new sessions for development, run tasks, etc."""
             pass
 
         @weblab_cli.command('clean-expired-users')
@@ -462,8 +462,8 @@ class WebLab(object):
         def fake():
             """Fake user management.
 
-            With this interface, you can test your laboratory without WebLab-Deusto. It implements the same
-            methods used by WebLab-Deusto (create new user, check status, kick out user), from a command
+            With this interface, you can test your laboratory without LabDiscoveryEngine. It implements the same
+            methods used by LabDiscoveryEngine (create new user, check status, kick out user), from a command
             line interface. The "new" command has several parameters for changing language, user name, etc.
             """
             pass
@@ -492,7 +492,7 @@ class WebLab(object):
         @click.option('--client-initial-data-file', default=None, help="Client initial data (JSON file)")
         def fake_user(name, username, username_unique, assigned_time, back, locale, experiment_name, category_name, dont_open_browser, client_initial_data, client_initial_data_file):
             """
-            Create a fake WebLab-Deusto user session.
+            Create a fake LabDiscoveryEngine user session.
 
             This command creates a new user session and stores the session in disk, so you
             can use other commands to check its status or delete it.
@@ -542,7 +542,7 @@ class WebLab(object):
                 print()
                 print("Session identifier: {}\n".format(result['session_id']))
                 open(".fake_weblab_user_session_id", 'w').write(result['session_id'])
-                print("Now you can make calls as if you were WebLab-Deusto (no argument needed):")
+                print("Now you can make calls as if you were LabDiscoveryEngine (no argument needed):")
                 print(" - flask weblab fake status")
                 print(" - flask weblab fake dispose")
                 print()
@@ -559,7 +559,7 @@ class WebLab(object):
             Check status of a fake user.
 
             Once you create a user with flask "weblab fake new", you can use this command to
-            simulate the status method of WebLab-Deusto and see what it would return.
+            simulate the status method of LabDiscoveryEngine and see what it would return.
             """
             if not os.path.exists('.fake_weblab_user_session_id'):
                 print("Session not found. Did you call 'flask weblab fake new' first?")
@@ -575,7 +575,7 @@ class WebLab(object):
             End a session of a fake user.
 
             Once you create a user with 'flask weblab fake new', you can use this command to
-            simulate the dispose method of WebLab-Deusto to kill the current session.
+            simulate the dispose method of LabDiscoveryEngine to kill the current session.
             """
             if not os.path.exists('.fake_weblab_user_session_id'):
                 print("Session not found. Did you call 'flask weblab fake new' first?")
@@ -691,8 +691,8 @@ class WebLab(object):
 
         This function has two parameters:
 
-        :param client_data: Data provided by the WebLab-Deusto client. It is a dictionary with different parameters.
-        :param server_data: Data provided by the WebLab-Deusto server (username, etc., generally wrapped in the ``weblab_user`` method)
+        :param client_data: Data provided by the LabDiscoveryEngine client. It is a dictionary with different parameters.
+        :param server_data: Data provided by the LabDiscoveryEngine server (username, etc., generally wrapped in the ``weblab_user`` method)
         """
         if self._on_start is not None:
             raise ValueError("on_start has already been defined")
@@ -716,7 +716,7 @@ class WebLab(object):
 
     def clean_expired_users(self):
         """
-        Typically, users are deleted by WebLab-Deusto calling the dispose method.
+        Typically, users are deleted by LabDiscoveryEngine calling the dispose method.
         However, in some conditions (e.g., restarting WebLab), the dispose method
         might not be called, and the laboratory can end in a wrong state. So as to
         avoid this, labdiscoverylib provides three systems:
@@ -1218,11 +1218,11 @@ def socket_requires_active(func):
 
 def logout():
     """
-    Notify WebLab-Deusto that the user left the laboratory, so next user can enter.
+    Notify LabDiscoveryEngine that the user left the laboratory, so next user can enter.
 
-    This process is not real time. What it happens is that WebLab-Deusto periodically is requesting
+    This process is not real time. What it happens is that LabDiscoveryEngine periodically is requesting
     whether the user is still alive or not. If you call logout, labdiscoverylib will reply the next time
-    that the user left. So it may take some seconds for WebLab-Deusto to realize of that. You can
+    that the user left. So it may take some seconds for LabDiscoveryEngine to realize of that. You can
     regulate this time with ``WEBLAB_POLL_INTERVAL`` setting (defaults to 5).
     """
     session_id = _current_session_id()

@@ -12,7 +12,7 @@ from flask import Blueprint, Response, current_app, jsonify, request, url_for
 
 from labdiscoverylib.exc import NotFoundError
 from labdiscoverylib.config import ConfigurationKeys
-from labdiscoverylib.utils import create_token, _to_timestamp, _current_backend, _current_weblab, _current_timestamp
+from labdiscoverylib.utils import create_token, _to_timestamp, _current_backend, _current_weblab
 from labdiscoverylib.users import CurrentUser, _set_weblab_user_cache
 from labdiscoverylib.ops import status_time, update_weblab_user_data, dispose_user
 
@@ -83,37 +83,66 @@ def _start_session():
     return jsonify(**_process_start_request(request_data))
 
 def _process_start_request(request_data):
-    """ Auxiliar method, called also from the Flask CLI to fake_user """
-    client_initial_data = request_data['client_initial_data']
-    server_initial_data = request_data['server_initial_data']
+    """ 
+    Auxiliar method, called also from the Flask CLI to fake_user.
+
+    The expected request_data looks like this:
+
+    {
+        'request': {
+            'locale': 'en',
+            'ldeReservationId': 'Zyv24cnaOqWXnZVO2v3hdQdrIxBC66BM9VM1EUFCBqM',
+            'user': {
+                # User data
+            },
+            'server': {
+                # Server data
+            },
+            'backUrl': "http://...", # wherever we have to redirect the user after
+        },
+        'laboratory': {
+            'name': "My lab",
+            'category': "My category", # Optional
+        },
+        'user': {
+            'username': "john", # Not guaranteed to be unique
+            'unique': "john@labsland",
+            'fullName': "John Smith", # Optional
+        },
+        'schedule': {
+            'start': "2023-12-06T23:13:58.076302+00:00",
+            'length': 298, # seconds left after that start
+        }
+    }
+
+    """
+    client_initial_data = request_data['request'].get('user')
+    server_initial_data = request_data['request'].get('server')
 
     # Parse the initial date + assigned time to know the maximum time
-    start_date_timestamp = server_initial_data.get('priority.queue.slot.start.timestamp')
-    if start_date_timestamp: # if the time is available in timestamp, use it
-        start_date = datetime.datetime.fromtimestamp(float(start_date_timestamp))
-    else:
-        # Otherwise, to keep backwards compatibility, assume that it's in the same timezone
-        # as we are
-        start_date_str = server_initial_data['priority.queue.slot.start']
-        start_date_str, microseconds = start_date_str.split('.')
-        difference = datetime.timedelta(microseconds=int(microseconds))
-        start_date = datetime.datetime.strptime(start_date_str, "%Y-%m-%d %H:%M:%S") + difference
-
-    slot_length = float(server_initial_data['priority.queue.slot.length'])
+    start_date = datetime.datetime.fromisoformat(request_data['schedule']['start'])
+    slot_length = float(request_data['schedule']['length'])
     max_date = start_date + datetime.timedelta(seconds=slot_length)
-    locale = server_initial_data.get('request.locale')
-    full_name = server_initial_data['request.full_name']
+    locale = request_data['request'].get('locale', 'en')
+    full_name = request_data['user'].get('fullName')
 
-    experiment_name = server_initial_data['request.experiment_id.experiment_name']
-    category_name = server_initial_data['request.experiment_id.category_name']
-    experiment_id = '{}@{}'.format(experiment_name, category_name)
+    experiment_name = request_data['laboratory']['name']
+    category_name = request_data['laboratory'].get('category')
+    if category_name:
+        experiment_id = '{}@{}'.format(experiment_name, category_name)
+    else:
+        experiment_id = experiment_name
+
+    back_url = request_data['request']['backUrl']
 
     # Create a global session
     session_id = create_token()
 
+
     # Prepare adding this to backend
-    user = CurrentUser(session_id=session_id, back=request_data['back'],
-                       last_poll=_current_timestamp(), max_date=float(_to_timestamp(max_date)),
+    user = CurrentUser(session_id=session_id, back=back_url,
+                       last_poll=datetime.datetime.now(datetime.timezone.utc),
+                       max_date=max_date,
                        username=server_initial_data['request.username'],
                        username_unique=server_initial_data['request.username.unique'],
                        exited=False, data={}, locale=locale,
@@ -121,7 +150,7 @@ def _process_start_request(request_data):
                        experiment_id=experiment_id, category_name=category_name,
                        request_client_data=client_initial_data,
                        request_server_data=server_initial_data,
-                       start_date=float(_to_timestamp(start_date)))
+                       start_date=start_date)
 
     backend = _current_backend()
 

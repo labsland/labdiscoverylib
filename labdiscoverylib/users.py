@@ -6,9 +6,10 @@
 import abc
 import json
 import zlib
+import datetime
 import warnings
 
-import six
+from typing import Optional
 
 from werkzeug.datastructures import ImmutableDict
 from werkzeug.local import LocalProxy
@@ -71,15 +72,15 @@ class WebLabUser(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractproperty
-    def active(self):
+    def active(self) -> bool:
         """Is the user active right now or not?"""
 
     @abc.abstractproperty
-    def is_anonymous(self):
+    def is_anonymous(self) -> bool:
         """Was the user a valid user recently?"""
 
     @abc.abstractmethod
-    def __str__(self):
+    def __str__(self) -> str:
         """str representation"""
 
 class AnonymousDataImmutableDict(dict):
@@ -92,33 +93,32 @@ class AnonymousDataImmutableDict(dict):
 
     pop = popitem = copy = update = clear = _method
 
-@six.python_2_unicode_compatible
 class AnonymousUser(WebLabUser):
     """
     Implementation of :class:`WebLabUser` representing anonymous users.
     """
 
     @property
-    def active(self):
+    def active(self) -> bool:
         """Is active? Always ``False``"""
         return False
 
     @property
-    def is_anonymous(self):
+    def is_anonymous(self) -> bool:
         """Is anonymous? Always ``True``"""
         return True
 
     @property
-    def locale(self):
-        """Language requested by WebLab-Deusto? Always ``None``"""
+    def locale(self) -> Optional[str]:
+        """Language requested by LabDiscoveryEngine? Always ``None``"""
         return None
 
     @property
-    def data(self):
+    def data(self) -> dict:
         """An object that raises error if accessed as a dict"""
         return AnonymousDataImmutableDict()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "Anonymous user"
 
 _OBJECT = object()
@@ -145,52 +145,52 @@ class _CurrentOrExpiredUser(WebLabUser): # pylint: disable=abstract-method
         self._request_server_data = request_server_data
 
     @property
-    def experiment_name(self):
-        """Experiment name (as in WebLab-Deusto)"""
+    def experiment_name(self) -> str:
+        """Experiment name (as in LabDiscoveryEngine)"""
         return self._experiment_name
 
     @property
-    def category_name(self):
-        """Experiment category name (as in WebLab-Deusto)"""
+    def category_name(self) -> Optional[str]:
+        """Experiment category name (as in LabDiscoveryEngine)"""
         return self._category_name
 
     @property
-    def experiment_id(self):
-        """Experiment id (as in WebLab-Deusto)"""
+    def experiment_id(self) -> str:
+        """Experiment id (as in LabDiscoveryEngine)"""
         return self._experiment_id
 
     @property
-    def full_name(self):
+    def full_name(self) -> Optional[str]:
         """User full name"""
         return self._full_name
 
     @property
-    def locale(self):
+    def locale(self) -> Optional[str]:
         """Language requested by the system (e.g., was the user using Moodle in Spanish?). 'es'"""
         return self._locale
 
     @property
-    def back(self):
+    def back(self) -> str:
         """URL of the previous website. When the user has finished, redirect him there"""
         return self._back
 
     @property
-    def last_poll(self):
+    def last_poll(self) -> datetime.datetime:
         """Last time the user called poll() (can be done by an automated process)"""
         return self._last_poll
 
     @property
-    def session_id(self):
+    def session_id(self) -> str:
         """Session identifying the current user"""
         return self._session_id
 
     @property
-    def max_date(self):
+    def max_date(self) -> datetime.datetime:
         """When should the user finish"""
         return self._max_date
 
     @property
-    def username(self):
+    def username(self) -> str:
         """
         Username of the user. Note: this is short, but not unique across institutions.
         There could be a ``john`` in ``institutionA`` and another ``john`` in ``institutionB``
@@ -198,7 +198,7 @@ class _CurrentOrExpiredUser(WebLabUser): # pylint: disable=abstract-method
         return self._username
 
     @property
-    def username_unique(self):
+    def username_unique(self) -> str:
         """
         Unique username across institutions. It's ``john@institutionA`` (which is
         different to ``john@institutionB``)
@@ -206,34 +206,34 @@ class _CurrentOrExpiredUser(WebLabUser): # pylint: disable=abstract-method
         return self._username_unique
 
     @property
-    def exited(self):
+    def exited(self) -> bool:
         """
         Did the user call :func:`logout`?
         """
         return self._exited
 
     @property
-    def request_client_data(self):
+    def request_client_data(self) -> ImmutableDict:
         """
         Information provided in the beginning of the interaction (on_start): client_data
         """
         return ImmutableDict(self._request_client_data or {})
 
     @property
-    def request_server_data(self):
+    def request_server_data(self) -> ImmutableDict:
         """
         Information provided in the beginning of the interaction (on_start): server_data
         """
         return ImmutableDict(self._request_server_data or {})
 
     @property
-    def start_date(self):
+    def start_date(self) -> datetime.datetime:
         """
         Information provided in the beginning of the interaction (on_start): client_data
         """
         return self._start_date
 
-    def add_action(self, session_id, action):
+    def add_action(self, session_id: str, action):
         """
         Adds a new raw action to a session_id, returning the action_id
         """
@@ -255,6 +255,9 @@ class _CurrentOrExpiredUser(WebLabUser): # pylint: disable=abstract-method
         backend = _current_backend()
         backend.clean_actions(session_id)
 
+def utcnow():
+    return datetime.datetime.now(datetime.timezone.utc)
+
 class DataHolder(dict):
     def __init__(self, user, data, previous_hash=None):
         super(DataHolder, self).__init__(data)
@@ -262,13 +265,11 @@ class DataHolder(dict):
         self._initial_hash = previous_hash or self._get_hash(data)
 
     @property
-    def initial_hash(self):
+    def initial_hash(self) -> str:
         return self._initial_hash
 
     def _get_hash(self, data):
         data_str = json.dumps(data)
-        if six.PY2:
-            data_str = data_str.decode('utf8')
         return zlib.crc32(data_str.encode('utf8'))
 
     def store(self):
@@ -295,7 +296,6 @@ class DataHolder(dict):
                 if key not in user.data:
                     self.pop(key, None)
 
-@six.python_2_unicode_compatible
 class CurrentUser(_CurrentOrExpiredUser):
     """
     This class is a :class:`WebLabUser` representing a user which is still actively using a
@@ -316,7 +316,7 @@ class CurrentUser(_CurrentOrExpiredUser):
         return self._data
 
     @data.setter
-    def data(self, data):
+    def data(self, data: dict):
         self._data = DataHolder(self, data, previous_hash=self._data.initial_hash)
 
     def update_data(self, new_data=_OBJECT):
@@ -336,18 +336,18 @@ class CurrentUser(_CurrentOrExpiredUser):
         self.data = self._data
 
     @property
-    def time_without_polling(self):
+    def time_without_polling(self) -> float:
         """
         Seconds without polling
         """
-        return _current_timestamp() - self.last_poll
+        return (utcnow() - self.last_poll).total_seconds()
 
     @property
     def time_left(self):
         """
         Seconds left (0 if time passed)
         """
-        return max(0, self.max_date - _current_timestamp())
+        return max(0, (self.max_date - utcnow()).total_seconds())
 
     def to_expired_user(self):
         """
@@ -435,9 +435,8 @@ class CurrentUser(_CurrentOrExpiredUser):
         return False
 
     def __str__(self):
-        return 'Current user (id: {!r}): {!r} ({!r}), last poll: {:.2f} seconds ago. Max date in {:.2f} seconds. Redirecting to {!r}'.format(self._session_id, self._username, self._username_unique, self.time_without_polling, self._max_date - _current_timestamp(), self._back)
+        return 'Current user (id: {!r}): {!r} ({!r}), last poll: {:.2f} seconds ago. Max date in {:.2f} seconds. Redirecting to {!r}'.format(self._session_id, self._username, self._username_unique, self.time_without_polling, (self._max_date - utcnow()).total_seconds(), self._back)
 
-@six.python_2_unicode_compatible
 class ExpiredUser(_CurrentOrExpiredUser):
     """
     This class is a :class:`WebLabUser` representing a user which has been kicked out already.
@@ -491,4 +490,4 @@ class ExpiredUser(_CurrentOrExpiredUser):
         return False
 
     def __str__(self):
-        return 'Expired user (id: {!r}): {!r} ({!r}), max date in {:.2f} seconds. Redirecting to {!r}'.format(self._session_id, self._username, self._username_unique, self._max_date - _current_timestamp(), self._back)
+        return 'Expired user (id: {!r}): {!r} ({!r}), max date in {:.2f} seconds. Redirecting to {!r}'.format(self._session_id, self._username, self._username_unique, (self._max_date - utcnow()), self._back)
