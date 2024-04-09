@@ -67,7 +67,7 @@ if __name__ == '__main__':
     app.run(debug=True)
 ```
 
-## Advance examples
+## Advanced examples
 
 You may find [here](https://github.com/labsland/labdiscoverylib/tree/master/examples) the following examples:
  * [simple](https://github.com/labsland/labdiscoverylib/tree/master/examples/simple): basic usage, all in one file.
@@ -75,3 +75,20 @@ You may find [here](https://github.com/labsland/labdiscoverylib/tree/master/exam
  * [complete](https://github.com/labsland/labdiscoverylib/tree/master/examples/complete): based on advanced, but using WebSockets with Flask-SocketIO, internationalization with Flask-Babel and minimified static files with Flask-Assets.
 
 There is another example called ``quickstart``, which is the one used in the documentation, which is something in between ``simple`` and ``advanced``.
+
+## Example Reference Remote Labs
+
+As part of the LabDiscoveryEngine project, two reference remote labs have been developed using the LabDiscoveryEngine to serve as full examples:
+
+### FPGA remote lab
+
+The FPGA remote lab provides control over a FPGA device and is oriented towards computer vision and other applications. It is developed and hosted by H-BRS (Germany).
+The repository is found in: https://github.com/Andrea-Schwandt/LabDiscoverEngine-FPGA-Lab
+Andrea Schanwdt, its main developer, presents it here: https://youtu.be/2Da-6_kJjmI
+
+### Buck and Bust Converters remote lab
+
+The buck and bust converters remote labs allow students to experiment with these circuits. They are developed and hosted by CPNU (Ukraine).
+The repositories are found in:
+  - Hardware & Embedded Software: https://github.com/RTESdepartmentCPNU/LabDiscoveryCPNU/
+  - Web Application: https://github.com/vtinkerer/cnpu-remote-lab
